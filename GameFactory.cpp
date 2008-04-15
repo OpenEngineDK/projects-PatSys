@@ -14,7 +14,7 @@
 #include <Display/Viewport.h>
 #include <Display/ViewingVolume.h>
 #include <Display/SDLFrame.h>
-#include <Devices/SDLInput.h>
+#include <Devices/AntSDLInput.h>
 #include <Display/Frustum.h>
 #include <Renderers/OpenGL/Renderer.h>
 #include <Renderers/OpenGL/RenderingView.h>
@@ -33,16 +33,20 @@
 #include <Particles/Modifiers.h>
 #include <Particles/PointEmitter.h>
 #include <Utils/PropertyList.h>
+#include <Display/AntTweakBarModule.h>
 
 // Project files
 #include "DownCameraEventHandler.h"
 #include "CustomLevel.h"
+
+#include "PlistBar.h"
 
 // Additional namespaces (others are in the header).
 using namespace OpenEngine::Devices;
 using namespace OpenEngine::Renderers::OpenGL;
 using namespace OpenEngine::Particles;
 using namespace OpenEngine::Utils;
+using namespace OpenEngine::Display;
 using OpenEngine::EventHandlers::DownCameraEventHandler;
 using OpenEngine::Level::CustomLevel;
 
@@ -100,6 +104,9 @@ public:
 };
 
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
 /**
  * Factory constructor.
  *
@@ -109,7 +116,7 @@ public:
 GameFactory::GameFactory() {
 
     // Create a frame and viewport.
-    this->frame = new SDLFrame(800, 600, 32);
+    this->frame = new SDLFrame(WINDOW_WIDTH, WINDOW_HEIGHT, 32);
 
     // Main viewport
     Viewport* viewport = new Viewport(*frame);
@@ -152,7 +159,7 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
 
     // Add your mouse and keyboard module here
-    SDLInput* input = new SDLInput();
+    AntSDLInput* input = new AntSDLInput();
     ParticleSystem* system = new ParticleSystem();
     PointEmitter<ParticleType> * emitter = new PointEmitter<ParticleType >(10); 
     emitter->prototype.energy = 42;
@@ -161,6 +168,9 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     emitter->prototype.texr = ResourceManager<ITextureResource>::Create("Smoke/smoke03.tga");
     GroupType* group = new GroupType(1000, emitter);
 
+	PropertyList *plist = new PropertyList("particles.txt");
+
+	
     //group->AddModifier(new StaticForceModifier<ParticleType >(Vector<3,float>(1,1,1)));
     group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<3,float> >
                        (&ParticleType::AddToPos, Vector<3,float>(.5,.5,.5)));
@@ -169,8 +179,15 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
 //                        (&ParticleType::AddToColor, Vector<4,float>(.3,.3,.3,1)));
 
 
-    group->AddModifier(new StaticFieldModifier<ParticleType, float >
-                       (&ParticleType::AddToRotation, 10.0));
+//    group->AddModifier(new StaticFieldModifier<ParticleType, float >
+//                       (&ParticleType::AddToRotation, 10.0));
+	float *p = plist->GetFloatP("test.test");
+
+	AntTweakBarModule *tw = new AntTweakBarModule(WINDOW_WIDTH, WINDOW_HEIGHT);
+	tw->AddBar(new PlistBar(*plist));
+	
+    group->AddModifier(new PointerFieldModifier<ParticleType, float >
+                       (&ParticleType::AddToRotation, p));
 
 
     group->AddModifier(new StaticFieldModifier<ParticleType, Vector<3,float> >
@@ -187,9 +204,12 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     DownCameraEventHandler* cameraHandler = new DownCameraEventHandler(camera,
                                                                        this);
     
+	input->SetValidator(&AntTweakBarModule::HandleEvent);
+	
     engine.AddModule(*input);
     engine.AddModule(*system, IGameEngine::TICK_DEPENDENT);
     engine.AddModule(*cameraHandler);
+	engine.AddModule(*tw);
 
     
 
@@ -206,11 +226,13 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
 
     scene->AddNode(staticScene);
 
+	
     //SceneNode* glSet = new GLSettings();
     scene->/*AddNode(glSet);
              glSet->*/
         AddNode(new BillBoardRenderNode<ParticleType ,GroupType >(group));
-    
+
+    scene->AddNode(tw->RenderNode());
 
     // Supply the scene to the renderer
     this->renderer->SetSceneRoot(scene);

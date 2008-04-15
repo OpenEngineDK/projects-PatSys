@@ -9,6 +9,7 @@ SET( PROJECT_SOURCES
   GameFactory.cpp
   CustomLevel.cpp
   DownCameraEventHandler.cpp
+  PlistBar.cpp
 )
 
 # Include needed to use SDL under Mac OS X
@@ -37,4 +38,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   Extensions_AccelerationStructures
   Extensions_TGAResource
   Extensions_OBJResource
+  Extensions_AntTweakBar
 )

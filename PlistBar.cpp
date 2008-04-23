@@ -1,4 +1,5 @@
 #include "PlistBar.h"
+#include <Logging/Logger.h>
 
 PlistBar::PlistBar(PropertyList& pl) : ITweakBar(pl.GetFileName()), plist(pl) {
 
@@ -35,6 +36,26 @@ void PlistBar::AddFields(ITweakBar* bar) {
                        TW_TYPE_FLOAT,
                        p,
                        NULL);
+        } else if (type == "vector3float") {
+            Vector<3,float> *pv;
+            pv = (Vector<3,float>*)p;
+            TwAddVarRW(bar->GetBar(),
+                       (key + "-x").c_str(),
+                       TW_TYPE_FLOAT,
+                       &(pv->elm[0]),
+                       (string("label='x' group=") + key).c_str());
+            TwAddVarRW(bar->GetBar(),
+                       (key + "-y").c_str(),
+                       TW_TYPE_FLOAT,
+                       &(pv->elm[1]),
+                       (string("label='y' group=") + key).c_str());
+            TwAddVarRW(bar->GetBar(),
+                       (key + "-z").c_str(),
+                       TW_TYPE_FLOAT,
+                       &(pv->elm[2]),
+                       (string("label='z' group=") + key).c_str());
+            
+            logger.info << "Add "  << key.c_str() << logger.end;
         }
     }
     

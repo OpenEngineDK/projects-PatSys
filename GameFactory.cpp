@@ -149,7 +149,7 @@ GameFactory::GameFactory() {
  */
 bool GameFactory::SetupEngine(IGameEngine& engine) {
 
-#define ParticleType BillBoardParticle<EnergyParticle<IParticle> >
+#define ParticleType BillBoardParticle<EnergyParticle<DirectionParticle<IParticle> > >
 #define GroupType EnergyParticleGroup<ParticleType >
 
     string resourcedir = "./projects/PatSys/data/";
@@ -162,18 +162,26 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     AntSDLInput* input = new AntSDLInput();
     ParticleSystem* system = new ParticleSystem();
     PointEmitter<ParticleType> * emitter = new PointEmitter<ParticleType >(10); 
-    emitter->prototype.energy = 42;
-    emitter->prototype.size = 5;
-    emitter->prototype.color = Vector<4,float>(.5,.5,.5,1);
-    emitter->prototype.texr = ResourceManager<ITextureResource>::Create("Smoke/smoke03.tga");
+    
+    PropertyList *plist = new PropertyList("particles.txt");
+    
+
+    
+    plist->SetFloatP(&(emitter->prototype->energy), "test.energy");
+    plist->SetVectorP(&(emitter->prototype->pos), "test.start");
+    plist->SetVectorP(&(emitter->prototype->direction), "test.dir");
+    //emitter->prototype->size = 5;
+    plist->SetFloatP(&(emitter->prototype->size), "test.size");
+    emitter->prototype->color = Vector<4,float>(1,.5,.5,.5);
+    emitter->prototype->texr = ResourceManager<ITextureResource>::Create("particle.tga");
     GroupType* group = new GroupType(1000, emitter);
 
-	PropertyList *plist = new PropertyList("particles.txt");
+	
 
 	
     //group->AddModifier(new StaticForceModifier<ParticleType >(Vector<3,float>(1,1,1)));
     group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<3,float> >
-                       (&ParticleType::AddToPos, Vector<3,float>(.5,.5,.5)));
+                       (&ParticleType::AddToPos, Vector<3,float>(.5,.7,.9)));
 
 //     group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<4,float> >
 //                        (&ParticleType::AddToColor, Vector<4,float>(.3,.3,.3,1)));
@@ -183,20 +191,26 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
 //                       (&ParticleType::AddToRotation, 10.0));
 	float *p = plist->GetFloatP("test.test");
 
+    Vector<3,float> *pv = plist->GetVectorP<3,float>("test.vec");
+    
 	AntTweakBarModule *tw = new AntTweakBarModule(WINDOW_WIDTH, WINDOW_HEIGHT);
 	tw->AddBar(new PlistBar(*plist));
 	
     group->AddModifier(new PointerFieldModifier<ParticleType, float >
                        (&ParticleType::AddToRotation, p));
+    
+    group->AddModifier(new PointerFieldModifier<ParticleType, Vector<3,float> >
+                       (&ParticleType::AddToPos, pv));
 
 
     group->AddModifier(new StaticFieldModifier<ParticleType, Vector<3,float> >
-                       (&ParticleType::AddToPos, Vector<3,float>(.5,.7,0)));
+                       (&ParticleType::AddToPos, Vector<3,float>(.3,.2,0)));
     //group->AddModifier(new StaticEnergyModifier<ParticleType >(-10.0f));
     group->AddModifier(new StaticFieldModifier<ParticleType, float>
                        (&ParticleType::AddToEnergy, -1.0f));
     
-                                                                    
+    group->AddModifier(new FieldFieldModifier<ParticleType, Vector<3,float> >
+                       (&ParticleType::AddToPos, &ParticleType::GetDirection));
 
     system->AddGroup(group);
 

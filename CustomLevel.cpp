@@ -67,16 +67,13 @@ void CustomLevel::Load() {
 //     }
     
     IModelResourcePtr res;
-    GeometryNode* geom;
+    ISceneNode* geom;
     FaceSet* fs;
 
     for (int i = 0; i < p.ListSize("sGeometry"); i++) {
         res = ResourceManager<IModelResource>::Create(p.GetString("sGeometry", i).data());
-        geom = new GeometryNode();
-        res->Load();
-        fs = res->GetFaceSet();
-        geom->SetFaceSet(fs);
-        res->Unload();
+		res->Load();
+        geom = res->GetSceneNode();
         scene->AddNode(geom);
         
         if (createBSP) {
@@ -94,11 +91,8 @@ void CustomLevel::Load() {
 
     for (int i = 0; i < p.ListSize("nsGeometry"); i++) {
         res = ResourceManager<IModelResource>::Create(p.GetString("nsGeometry", i).data());
-        geom = new GeometryNode();
-        res->Load();
-        fs = res->GetFaceSet();
-        geom->SetFaceSet(fs);
-        res->Unload();
+		res->Load();
+        geom = res->GetSceneNode();
         scene->AddNode(geom);
     }
 

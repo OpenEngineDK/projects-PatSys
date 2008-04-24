@@ -42,17 +42,17 @@ void PlistBar::AddFields(ITweakBar* bar) {
             TwAddVarRW(bar->GetBar(),
                        (key + "-x").c_str(),
                        TW_TYPE_FLOAT,
-                       &(pv->GetElmPointer()[0]),
+					   &((*pv)[0]),
                        (string("label='x' group=") + key).c_str());
             TwAddVarRW(bar->GetBar(),
                        (key + "-y").c_str(),
                        TW_TYPE_FLOAT,
-                       &(pv->GetElmPointer()[1]),
+					   &((*pv)[1]),
                        (string("label='y' group=") + key).c_str());
             TwAddVarRW(bar->GetBar(),
                        (key + "-z").c_str(),
                        TW_TYPE_FLOAT,
-                       &(pv->GetElmPointer()[2]),
+					   &((*pv)[2]),
                        (string("label='z' group=") + key).c_str());
             
             logger.info << "Add "  << key.c_str() << logger.end;

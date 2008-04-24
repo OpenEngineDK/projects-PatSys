@@ -25,7 +25,7 @@ void PlistBar::AddFields(ITweakBar* bar) {
          itr++) {
         pair<string,pair<int,pair<string,void*> > > elm = *itr;
         string key = elm.first;
-        int idx = elm.second.first;
+        //int idx = elm.second.first;
         string type = elm.second.second.first;
         void* p = elm.second.second.second;
 
@@ -42,17 +42,17 @@ void PlistBar::AddFields(ITweakBar* bar) {
             TwAddVarRW(bar->GetBar(),
                        (key + "-x").c_str(),
                        TW_TYPE_FLOAT,
-                       &(pv->elm[0]),
+                       &(pv->GetElmPointer()[0]),
                        (string("label='x' group=") + key).c_str());
             TwAddVarRW(bar->GetBar(),
                        (key + "-y").c_str(),
                        TW_TYPE_FLOAT,
-                       &(pv->elm[1]),
+                       &(pv->GetElmPointer()[1]),
                        (string("label='y' group=") + key).c_str());
             TwAddVarRW(bar->GetBar(),
                        (key + "-z").c_str(),
                        TW_TYPE_FLOAT,
-                       &(pv->elm[2]),
+                       &(pv->GetElmPointer()[2]),
                        (string("label='z' group=") + key).c_str());
             
             logger.info << "Add "  << key.c_str() << logger.end;

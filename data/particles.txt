@@ -1,0 +1,10 @@
+include * meta.txt
+
+emit.speed = 10
+test.test = 0.0
+test.vec = v(0,0,0)
+test.energy = 10
+test.start = v(0,0,0)
+test.dir = v(0,0,0)
+test.size = 10
+wobbly.active = true

@@ -1,0 +1,3 @@
+meta.energy.min = 0
+meta.energy.max = 100
+meta.size.min = 0

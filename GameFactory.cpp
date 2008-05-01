@@ -78,25 +78,25 @@ public:
     void Apply(IRenderingView* view) {
         // Enable color material, including face colors when blending. 
         //glEnable(GL_COLOR_MATERIAL);
-
+        
         GLfloat light_position[] = { 0.0, 0.0, 10.0, 1.0 };
         GLfloat lm_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
         glLightfv(GL_LIGHT0, GL_POSITION, light_position);
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lm_ambient);
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
-
+        
         glClearColor(.9f,
                      .9f,
                      .9f,
                      .0f);
-
+        
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);	// Turn Depth Testing Off
-
+        
         VisitSubNodes(*view);
-
+        
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
@@ -114,28 +114,28 @@ public:
  * the setup method is executed.
  */
 GameFactory::GameFactory() {
-
+    
     // Create a frame and viewport.
     this->frame = new SDLFrame(WINDOW_WIDTH, WINDOW_HEIGHT, 32);
-
+    
     // Main viewport
     Viewport* viewport = new Viewport(*frame);
     camera = new Camera(*(new ViewingVolume()));
     camera->SetPosition(Vector<3,float>(-100,0,-10));
     camera->LookAt(Vector<3,float>(0,0,0));
-
+    
     // Bind the camera to the viewport
     Frustum* frustum = new Frustum(*camera);
     frustum->SetFar(1000);
     viewport->SetViewingVolume(frustum);
-
-
+    
+    
     // Create a renderer.
     this->renderer = new Renderer();
-
+    
     // Add a rendering view to the renderer
     this->renderer->AddRenderingView(new RenderingView(*viewport));
-
+    
 }
 
 /**
@@ -148,24 +148,25 @@ GameFactory::GameFactory() {
  * @param engine The game engine instance.
  */
 bool GameFactory::SetupEngine(IGameEngine& engine) {
-
+    
 #define ParticleType BillBoardParticle<EnergyParticle<DirectionParticle<IParticle> > >
 #define GroupType EnergyParticleGroup<ParticleType >
-
+    
     string resourcedir = "./projects/PatSys/data/";
     DirectoryManager::AppendPath(resourcedir);
-
+    
     ResourceManager<ITextureResource>::AddPlugin(new TGAPlugin());
     ResourceManager<IModelResource>::AddPlugin(new OBJPlugin());
-
+    
     // Add your mouse and keyboard module here
     AntSDLInput* input = new AntSDLInput();
     ParticleSystem* system = new ParticleSystem();
     PointEmitter<ParticleType> * emitter = new PointEmitter<ParticleType >(10); 
     
-    PropertyList *plist = new PropertyList("particles.txt");
+	PropertyList *plist = new PropertyList("particles.txt");
     
-
+	plist->SetIntP(&(emitter->speed), "emit.speed");
+    
     
     plist->SetFloatP(&(emitter->prototype->energy), "test.energy");
     plist->SetVectorP(&(emitter->prototype->pos), "test.start");
@@ -175,22 +176,27 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     emitter->prototype->color = Vector<4,float>(1,.5,.5,.5);
     emitter->prototype->texr = ResourceManager<ITextureResource>::Create("particle.tga");
     GroupType* group = new GroupType(1000, emitter);
-
+    
 	
-
+    
 	
     //group->AddModifier(new StaticForceModifier<ParticleType >(Vector<3,float>(1,1,1)));
-    group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<3,float> >
-                       (&ParticleType::AddToPos, Vector<3,float>(.5,.7,.9)));
-
-//     group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<4,float> >
-//                        (&ParticleType::AddToColor, Vector<4,float>(.3,.3,.3,1)));
-
-
-//    group->AddModifier(new StaticFieldModifier<ParticleType, float >
-//                       (&ParticleType::AddToRotation, 10.0));
+	WobblyFieldModifier<ParticleType, Vector<3,float> > *wob = new WobblyFieldModifier<ParticleType, Vector<3,float> >
+	(&ParticleType::AddToPos, Vector<3,float>(.5,.7,.9));
+	
+	plist->SetBoolP(&(wob->active), "wobbly.active");
+	
+	//wob->active = plist->GetBool("wobbly.active");
+    group->AddModifier(wob);
+    
+    //     group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<4,float> >
+    //                        (&ParticleType::AddToColor, Vector<4,float>(.3,.3,.3,1)));
+    
+    
+    //    group->AddModifier(new StaticFieldModifier<ParticleType, float >
+    //                       (&ParticleType::AddToRotation, 10.0));
 	float *p = plist->GetFloatP("test.test");
-
+    
     Vector<3,float> *pv = plist->GetVectorP<3,float>("test.vec");
     
 	AntTweakBarModule *tw = new AntTweakBarModule(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -201,8 +207,8 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     
     group->AddModifier(new PointerFieldModifier<ParticleType, Vector<3,float> >
                        (&ParticleType::AddToPos, pv));
-
-
+    
+    
     group->AddModifier(new StaticFieldModifier<ParticleType, Vector<3,float> >
                        (&ParticleType::AddToPos, Vector<3,float>(.3,.2,0)));
     //group->AddModifier(new StaticEnergyModifier<ParticleType >(-10.0f));
@@ -211,10 +217,10 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     
     group->AddModifier(new FieldFieldModifier<ParticleType, Vector<3,float> >
                        (&ParticleType::AddToPos, &ParticleType::GetDirection));
-
+    
     system->AddGroup(group);
-
-
+    
+    
     DownCameraEventHandler* cameraHandler = new DownCameraEventHandler(camera,
                                                                        this);
     
@@ -224,64 +230,64 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     engine.AddModule(*system, IGameEngine::TICK_DEPENDENT);
     engine.AddModule(*cameraHandler);
 	engine.AddModule(*tw);
-
     
-
-
+    
+    
+    
     // Create a root scene node
     SceneNode* scene = new SceneNode();
     
-
+    
     PropertyList* pSimple = new PropertyList("levels/simple.lvl");
     CustomLevel* level = new CustomLevel(*pSimple);
     level->Load();
     //SceneNode* physNode = level->GetPhysicsGraph();
     SceneNode* staticScene = level->GetSceneGraph();
-
+    
     scene->AddNode(staticScene);
-
+    
 	
     //SceneNode* glSet = new GLSettings();
     scene->/*AddNode(glSet);
-             glSet->*/
-        AddNode(new BillBoardRenderNode<ParticleType ,GroupType >(group));
-
+     glSet->*/
+    AddNode(new BillBoardRenderNode<ParticleType ,GroupType >(group));
+    
     scene->AddNode(tw->RenderNode());
-
+    
     // Supply the scene to the renderer
     this->renderer->SetSceneRoot(scene);
-
+    
     // Bind the quit handler (the keyboard module needs to work for
     // the handler to actually quit).
     // For more information on the event system please read:
     // http://openengine.dk/wiki/EventSystemGuide
-
+    
     
     //Bind the camera handlers
     Listener<DownCameraEventHandler, MouseMovedEventArg>* cam_l
-      = new Listener<DownCameraEventHandler, MouseMovedEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseMoved);
+    = new Listener<DownCameraEventHandler, MouseMovedEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseMoved);
     IMouse::mouseMovedEvent.Add(cam_l);
-
+    
     Listener<DownCameraEventHandler, MouseButtonEventArg>* mdown
-        = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseDown);
+    = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseDown);
     IMouse::mouseDownEvent.Add(mdown);
-
+    
     Listener<DownCameraEventHandler, MouseButtonEventArg>* mup
-        = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseUp);
+    = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseUp);
     IMouse::mouseUpEvent.Add(mup);
-
-
+    
+    
     QuitEventHandler* quit_h = new QuitEventHandler();
     Listener<QuitEventHandler, KeyboardEventArg>* quit_l
-        = new Listener<QuitEventHandler, KeyboardEventArg> (*quit_h, &QuitEventHandler::HandleQuit);
+    = new Listener<QuitEventHandler, KeyboardEventArg> (*quit_h, &QuitEventHandler::HandleQuit);
     IKeyboard::keyUpEvent.Add(quit_l);
-
+    
     // Add some module
     engine.AddModule(*(new OpenEngine::Utils::Statistics(1000)));
-
+    
     // Return true to signal success.
     return true;
-
+    
 }
 
 // Other factory methods. The returned objects are all created in the

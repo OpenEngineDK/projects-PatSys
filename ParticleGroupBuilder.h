@@ -18,6 +18,14 @@ using namespace OpenEngine::Particles;
 using namespace OpenEngine::Utils;
 using namespace OpenEngine::Renderers;
 
+enum FieldType {
+    FT_NONE,
+    FT_INT,
+    FT_FLOAT,
+    FT_VECTOR3F,
+    FT_VECTOR4F
+};
+
 class ParticleGroupBuilder {
     PropertyList& plist;
     IParticleGroup* pGroup;
@@ -34,6 +42,11 @@ public:
     template <class T> static T* BuildParticle(PropertyList& plist, string group);
     template <class T, class G> static IRenderNode* BuildRenderNode(PropertyList& plist, string group, G* g);
     template <class T> static IModifier<T>* BuildModifier(PropertyList& plist, string group);
+    
+    template <class T> static pair<void (T::*)(float), int> MethodForField_float(string field);
+    template <class T> static pair<void (T::*)(Vector<3,float> ), int> MethodForField_vec3f(string field);
+    //pair<string, void (T::*)(F)> MethodForField(string field);
+    static FieldType TypeForField(string field);
 };
 
 #endif

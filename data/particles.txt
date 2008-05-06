@@ -38,10 +38,24 @@ p1.emitter.prototype.color = v(1,.5,.5,.5)
 
 
 p1.modifiers[0] = energy
+p1.modifiers[1] = move
+p1.modifiers[2] = shake
 
 p1.energy.type = PointerField
+p1.energy.active = true
 p1.energy.field = energy
 p1.energy.value = -1
+
+p1.move.type = PointerField
+p1.move.field = pos
+p1.move.active = true
+p1.move.value = v(0,1,0)
+
+p1.shake.type = WobblyField
+p1.shake.field = pos
+p1.shake.active = true
+p1.shake.value = v(1,1,1)
+
 
 p1.sizeIp.type = LinearInterpolation
 p1.sizeIp.field = size

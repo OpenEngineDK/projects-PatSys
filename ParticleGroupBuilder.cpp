@@ -110,21 +110,110 @@ template <class T, class G> IRenderNode* ParticleGroupBuilder::BuildRenderNode(P
 
 template <class T> IModifier<T>* ParticleGroupBuilder::BuildModifier(PropertyList& plist, string group) {
     string type = plist.GetString(group + ".type");
+
     if (type == "PointerField") {
-        
+              
         string field = plist.GetString(group + ".field");
-        if (field == "energy") {
-            
-            return new PointerFieldModifier<T , float> (&T::AddToEnergy, plist.GetFloatP(group + ".value"));
-            
-        } else {
-            logger.info << "unknown field" << logger.end;
+        FieldType type = TypeForField(field);
+        logger.info << "type is: " << type << logger.end;
+        switch (type) {
+            case FT_FLOAT: {
+                void (T::*ptr)(float);
+                //ptr = T::AddMethodForField<float>(field).first;
+                ptr = MethodForField_float<T>(field).first;
+                logger.info << "adding Pointer modifier" << logger.end;
+                PointerFieldModifier<T, float> *pfm = 
+                new PointerFieldModifier<T, float> (ptr, plist.GetFloatP(group + ".value"));
+                plist.SetBoolP(&(pfm->active), group + ".active");
+                return pfm;
+            }
+            case FT_VECTOR3F: {
+                void (T::*ptr)(Vector<3,float> );
+                ptr = MethodForField_vec3f<T>(field).first;
+                logger.info << "adding Pointer modifier" << logger.end;
+                PointerFieldModifier<T, Vector<3,float> > *pfm = 
+                new PointerFieldModifier<T, Vector<3,float> > (ptr, plist.GetVectorP<3,float>(group + ".value"));
+                plist.SetBoolP(&(pfm->active), group + ".active");
+                return pfm;
+                
+            }
+            default:
+                logger.info << "error, type not found" << logger.end;
         }
-            
-        
+    } else if (type == "WobblyField") {
+        string field = plist.GetString(group + ".field");
+        FieldType type = TypeForField(field);
+        logger.info << "type is: " << type << logger.end;
+        switch (type) {
+            case FT_FLOAT: {
+                void (T::*ptr)(float);
+                //ptr = T::AddMethodForField<float>(field).first;
+                ptr = MethodForField_float<T>(field).first;
+                logger.info << "adding Pointer modifier" << logger.end;
+                WobblyFieldModifier<T, float> *pfm = 
+                new WobblyFieldModifier<T, float> (ptr, plist.GetFloat(group + ".value"));
+                plist.SetFloatP(&(pfm->value), group + ".value");
+                plist.SetBoolP(&(pfm->active), group + ".active");
+                return pfm;
+            }
+            case FT_VECTOR3F: {
+                void (T::*ptr)(Vector<3,float> );
+                ptr = MethodForField_vec3f<T>(field).first;
+                logger.info << "adding Pointer modifier" << logger.end;
+                WobblyFieldModifier<T, Vector<3,float> > *pfm = 
+                new WobblyFieldModifier<T, Vector<3,float> > (ptr, plist.GetVector<3,float>(group + ".value"));
+                plist.SetVectorP<3,float>(&(pfm->value), group + ".value");
+                plist.SetBoolP(&(pfm->active), group + ".active");
+                return pfm;
+                
+            }
+            default:
+                logger.info << "error, type not found" << logger.end;
+        }
     } else {
         logger.info << "Unknown modifier: " << type << logger.end;
     
+        
         return NULL;
     }
+    return NULL;
+}
+
+template <class T> pair<void (T::*)(float), int> ParticleGroupBuilder::MethodForField_float(string field) {
+    if (field == "energy") {
+        return make_pair(&T::AddToEnergy,0);
+    }
+    logger.info << "field not found: " << field << logger.end;
+    return make_pair<void (T::*)(float), int>(NULL, -1);
+}
+
+template <class T> pair<void (T::*)(Vector<3,float> ), int> ParticleGroupBuilder::MethodForField_vec3f(string field) {
+    if (field == "pos") {
+        return make_pair(&T::AddToPos,0);
+    }
+    logger.info << "field not found: " << field << logger.end;
+    return make_pair<void (T::*)(Vector<3,float> ), int>(NULL, -1);
+}
+
+
+//
+//template <class T> pair<void (T::*)(F), int> ParticleGroupBuilder::MethodForField< Vector<3,float> (string field) {
+//    if (field == "energy") {
+//        return make_pair(&T::AddToEnergy,0);
+//    }
+//    logger.info << "field not found: " << field << logger.end;
+//    return make_pair<void (T::*)(F), int>(NULL, -1);
+//}
+//
+
+FieldType ParticleGroupBuilder::TypeForField(string field) {
+    if (field == "energy")
+        return FT_FLOAT;
+    else if (field == "pos")
+        return FT_VECTOR3F;
+    
+    logger.info << "unknown field: " << field << logger.end;
+    
+    return FT_NONE;
+    
 }

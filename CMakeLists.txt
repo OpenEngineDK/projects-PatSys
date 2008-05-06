@@ -10,6 +10,7 @@ SET( PROJECT_SOURCES
   CustomLevel.cpp
   DownCameraEventHandler.cpp
   PlistBar.cpp
+  ParticleGroupBuilder.cpp
 )
 
 # Include needed to use SDL under Mac OS X

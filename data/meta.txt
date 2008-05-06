@@ -1,3 +1,10 @@
 meta.energy.min = 0
 meta.energy.max = 100
 meta.size.min = 0
+meta.speed.min = 0
+
+meta.blendSrc.min = 0
+meta.blendDst.min = 0
+
+meta.blendSrc.max = 10
+meta.blendDst.max = 10

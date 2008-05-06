@@ -8,3 +8,47 @@ test.start = v(0,0,0)
 test.dir = v(0,0,0)
 test.size = 10
 wobbly.active = true
+
+#working blends:
+# src =  4, dst = 1 // glow
+# src =  8, dst = 5 // black
+# src =  4, dst = 5 // dim
+# src =  0, dst = 5 // black
+# src =  4, dst = 6 // glow
+# src =  *, dst = 8 // glow
+
+proto.blendSrc = 4
+proto.blendDst = 1
+
+proto.color = v(1,.5,.5,.5)
+
+# particle builder:
+
+p1.type = glow
+p1.count = 1000
+p1.render = Billboard
+p1.emitter.type = Point
+p1.emitter.speed = 10
+
+p1.emitter.prototype.texture = particle.tga
+p1.emitter.prototype.energy = 10
+p1.emitter.prototype.pos = v(0,0,0)
+p1.emitter.prototype.size = 10
+p1.emitter.prototype.color = v(1,.5,.5,.5)
+
+
+p1.modifiers[0] = energy
+
+p1.energy.type = PointerField
+p1.energy.field = energy
+p1.energy.value = -1
+
+p1.sizeIp.type = LinearInterpolation
+p1.sizeIp.field = size
+p1.sizeIp.points.time[0] = 0
+p1.sizeIp.points.value[0] = 10
+p1.sizeIp.points.time[1] = .5
+p1.sizeIp.points.value[1] = 30
+p1.sizeIp.points.time[2] = 1
+p1.sizeIp.points.value[2] = 5
+

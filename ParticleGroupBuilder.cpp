@@ -83,7 +83,7 @@ template <class T> T* ParticleGroupBuilder::BuildParticle(PropertyList& plist, s
         particle->texr = ResourceManager<ITextureResource>::Create(plist.GetString(group + ".texture"));
     if (plist.HaveKey(group + ".energy")) {
         plist.SetFloatP(&(particle->energy), group + ".energy");
-        plist.SetFloatP(&(particle->lifespan), group + ".energy");
+        //plist.SetFloatP(&(particle->lifespan), group + ".energy");
     }
     if (plist.HaveKey(group + ".pos")) 
         plist.SetVectorP(&(particle->pos), group + ".pos");

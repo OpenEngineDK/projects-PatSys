@@ -285,9 +285,9 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
 //     glSet->*/
 //    AddNode(new BillBoardRenderNode<ParticleType ,GroupType >(group));
     
-    scene->AddNode(tw->RenderNode());
     scene->AddNode(groupBuilder->GetRenderNode());
 
+    scene->AddNode(tw->RenderNode());
     
     //scene->AddNode(new BillBoardRenderNode<ParticleType ,GroupType >((GroupType*)groupBuilder->GetParticleGroup()));
     

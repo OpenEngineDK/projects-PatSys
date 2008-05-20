@@ -1,5 +1,5 @@
 meta.energy.min = 0
-meta.energy.max = 100
+meta.energy.max = 1000
 meta.size.min = 0
 meta.speed.min = 0
 

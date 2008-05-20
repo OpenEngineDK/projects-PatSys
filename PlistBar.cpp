@@ -7,15 +7,32 @@ PlistBar::PlistBar(PropertyList& pl) : ITweakBar(pl.GetFileName()), plist(pl) {
 
 PlistBar::~PlistBar() {}
 
+void PlistBar::AddCallBack(ICallback *cb) {
+    callbacks.push_back(cb);
+}
+
 void PlistBar::AddFields(ITweakBar* bar) {
     Callback<PlistBar>* rebindCB = 
     new Callback<PlistBar>(*this, &PlistBar::Rebind);
     
+    //AddButton<PlistBar>("Rebind", rebind);
+
     TwAddButton(bar->GetBar(),
                 "Rebind",
-                ITweakBar::AntCallback<PlistBar>,
+                ITweakBar::AntCallback,
                 rebindCB,
                 NULL);
+
+
+    for (list<ICallback*>::iterator itr = callbacks.begin();
+         itr != callbacks.end();
+         itr++) {
+        TwAddButton(bar->GetBar(),
+                    (*itr)->name.c_str(),
+                    ITweakBar::AntCallback,
+                    *itr,
+                    NULL);
+    }
     
     
     map<string,pair<int,pair<string,void*> > > pointers = plist.GetFetctPointers();

@@ -209,9 +209,7 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
 //    
 //    Vector<3,float> *pv = plist->GetVectorP<3,float>("test.vec");
 //    
-	AntTweakBarModule *tw = new AntTweakBarModule(WINDOW_WIDTH, WINDOW_HEIGHT);
-	tw->AddBar(new PlistBar(*plist));
-	
+    
 //    group->AddModifier(new PointerFieldModifier<ParticleType, float >
 //                       (&ParticleType::AddToRotation, p));
 //    
@@ -249,9 +247,30 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
 //    
 //    //system->AddGroup(group);
 //    
+
+
     ParticleGroupBuilder *groupBuilder = new ParticleGroupBuilder(*plist, string("p1"));
     
     system->AddGroup(groupBuilder->GetParticleGroup());
+
+	AntTweakBarModule *tw = new AntTweakBarModule(WINDOW_WIDTH, WINDOW_HEIGHT);
+    PlistBar *bar = new PlistBar(*plist);
+
+    EnergyParticleGroup<BillBoardParticle<EnergyParticle<DirectionParticle<IParticle> > > > *group = (EnergyParticleGroup<BillBoardParticle<EnergyParticle<DirectionParticle<IParticle> > > >*)(groupBuilder->GetParticleGroup());
+
+    Callback<EnergyParticleGroup<BillBoardParticle<EnergyParticle<DirectionParticle<IParticle> > > > >* goCB
+    = 
+        new
+        Callback<EnergyParticleGroup<BillBoardParticle<EnergyParticle<DirectionParticle<IParticle>
+        > >
+        > >(*group,
+            (&EnergyParticleGroup<BillBoardParticle<EnergyParticle<DirectionParticle<IParticle> > > >::Spawn));
+
+    tw->AddBar(bar);
+    goCB->name = "Go";
+    bar->AddCallBack(goCB);
+
+
     
     
     DownCameraEventHandler* cameraHandler = new DownCameraEventHandler(camera,

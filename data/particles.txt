@@ -27,6 +27,8 @@ proto.color = v(1,.5,.5,.5)
 p1.type = glow
 p1.count = 1000
 p1.render = Billboard
+p1.mode = 2
+p1.active = true
 p1.emitter.type = Point
 p1.emitter.speed = 10
 
@@ -35,11 +37,20 @@ p1.emitter.prototype.energy = 10
 p1.emitter.prototype.pos = v(0,0,0)
 p1.emitter.prototype.size = 10
 p1.emitter.prototype.color = v(1,.5,.5,.5)
+p1.emitter.prototype.direction = v(0,0,0)
+
+p1.emitter.modifiers[0] = randdir 
+
+p1.emitter.randdir.type = WobblyField
+p1.emitter.randdir.field = direction
+p1.emitter.randdir.active = true
+p1.emitter.randdir.value = v(0,0,0)
 
 
 p1.modifiers[0] = energy
 p1.modifiers[1] = move
 p1.modifiers[2] = shake
+p1.modifiers[3] = direction
 
 p1.energy.type = PointerField
 p1.energy.active = true
@@ -48,14 +59,18 @@ p1.energy.value = -1
 
 p1.move.type = PointerField
 p1.move.field = pos
-p1.move.active = true
+p1.move.active = false
 p1.move.value = v(0,1,0)
 
 p1.shake.type = WobblyField
 p1.shake.field = pos
-p1.shake.active = true
+p1.shake.active = false
 p1.shake.value = v(1,1,1)
 
+p1.direction.type = FieldField
+p1.direction.get = direction
+p1.direction.set = pos
+p1.direction.active = true
 
 p1.sizeIp.type = LinearInterpolation
 p1.sizeIp.field = size

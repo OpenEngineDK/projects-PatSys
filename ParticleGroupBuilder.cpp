@@ -51,6 +51,17 @@ pair<IParticleGroup*,IRenderNode*> ParticleGroupBuilder::BuildGroup(PropertyList
                 particleGroup->AddModifier(mof);
             
         }
+
+        plist.SetIntP(&(particleGroup->totalCount), group + ".count");
+        plist.SetBoolP(&(particleGroup->active), group + ".active");
+
+        plist.SetIntP(&(int(particleGroup->mode)), group + ".mode");
+        
+        // TwEnumVal modeEV[] = {{EnergyParticleGroup::CONTINUOUS, "Continuous"},
+//                               {EnergyParticleGroup::ALL, "All"},
+//                               {EnergyParticleGroup::NONE, "None"}};
+//         TwType modeType = TwDefineEnum("RespawnMode", modeEV, 3);
+        
     
         
         return make_pair(particleGroup,BuildRenderNode<ParticleTypeGlow,EnergyParticleGroup<ParticleTypeGlow> >(plist, group, particleGroup));
@@ -69,6 +80,18 @@ template <class T> IEmitter<T>* ParticleGroupBuilder::BuildEmitter(PropertyList&
         plist.SetIntP(&(emitter->speed), group + ".emitter.speed");
         emitter->SetPrototype(BuildParticle<T >(plist, group + ".emitter.prototype"));
         
+        // add modifiers to emitter
+        for (int i=0;
+             i<plist.ListSize(group + ".emitter.modifiers");
+             i++) {
+            string name = plist.GetString(group + ".emitter.modifiers",
+        i);
+            IModifier<T >* mof = BuildModifier<T >(plist, group +
+                                                   ".emitter." +
+        name);
+            if (mof != NULL)
+                emitter->AddModifier(mof);
+        }
         
         return emitter;
     } else {
@@ -87,6 +110,8 @@ template <class T> T* ParticleGroupBuilder::BuildParticle(PropertyList& plist, s
     }
     if (plist.HaveKey(group + ".pos")) 
         plist.SetVectorP(&(particle->pos), group + ".pos");
+    if (plist.HaveKey(group + ".direction")) 
+        plist.SetVectorP(&(particle->direction), group + ".direction");
     if (plist.HaveKey(group + ".size")) 
         plist.SetFloatP(&(particle->size), group + ".size");
     if (plist.HaveKey(group + ".color")) 
@@ -170,6 +195,35 @@ template <class T> IModifier<T>* ParticleGroupBuilder::BuildModifier(PropertyLis
             default:
                 logger.info << "error, type not found" << logger.end;
         }
+    } else if (type == "FieldField") {
+        string getField = plist.GetString(group + ".get");
+        string setField = plist.GetString(group + ".set");
+        FieldType getType = TypeForField(getField);
+        FieldType setType = TypeForField(setField);
+        if (getType != setType) {
+            logger.info << "forskellige felter... fail" << logger.end;
+            return NULL;
+        } else {
+            switch (getType) {
+            case FT_VECTOR3F: {
+                Vector<3,float> (T::*getPtr)();
+                void (T::*setPtr)(Vector<3,float>);
+                getPtr = MethodForField_get_vec3f<T>(getField).first;
+                setPtr = MethodForField_vec3f<T>(setField).first;
+                
+                FieldFieldModifier<T, Vector<3,float> > *ffm =
+                    new FieldFieldModifier<T, Vector<3,float> >(setPtr,
+                    getPtr);
+                
+                plist.SetBoolP(&(ffm->active), group + ".active");
+
+                return ffm;
+
+            }
+            default:
+                logger.info << "unkown type" << logger.end;
+            }
+        }
     } else {
         logger.info << "Unknown modifier: " << type << logger.end;
     
@@ -191,8 +245,19 @@ template <class T> pair<void (T::*)(Vector<3,float> ), int> ParticleGroupBuilder
     if (field == "pos") {
         return make_pair(&T::AddToPos,0);
     }
+    else if (field == "direction") {
+        return make_pair(&T::AddToDirection,0);
+    }
     logger.info << "field not found: " << field << logger.end;
     return make_pair<void (T::*)(Vector<3,float> ), int>(NULL, -1);
+}
+
+template <class T> pair<Vector<3,float> (T::*)( ), int> ParticleGroupBuilder::MethodForField_get_vec3f(string field) {
+    if (field == "direction") {
+        return make_pair(&T::GetDirection,0);
+    }
+    logger.info << "field not found: " << field << logger.end;
+    return make_pair<Vector<3,float> (T::*)( ), int>(NULL, -1);
 }
 
 
@@ -206,14 +271,15 @@ template <class T> pair<void (T::*)(Vector<3,float> ), int> ParticleGroupBuilder
 //}
 //
 
-FieldType ParticleGroupBuilder::TypeForField(string field) {
+ParticleGroupBuilder::FieldType ParticleGroupBuilder::TypeForField(string field) {
     if (field == "energy")
-        return FT_FLOAT;
-    else if (field == "pos")
-        return FT_VECTOR3F;
+        return ParticleGroupBuilder::FT_FLOAT;
+    else if (field == "pos" ||
+             field == "direction")
+        return ParticleGroupBuilder::FT_VECTOR3F;
     
     logger.info << "unknown field: " << field << logger.end;
     
-    return FT_NONE;
+    return ParticleGroupBuilder::FT_NONE;
     
 }

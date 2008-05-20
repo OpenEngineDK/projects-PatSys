@@ -18,13 +18,6 @@ using namespace OpenEngine::Particles;
 using namespace OpenEngine::Utils;
 using namespace OpenEngine::Renderers;
 
-enum FieldType {
-    FT_NONE,
-    FT_INT,
-    FT_FLOAT,
-    FT_VECTOR3F,
-    FT_VECTOR4F
-};
 
 class ParticleGroupBuilder {
     PropertyList& plist;
@@ -32,10 +25,21 @@ class ParticleGroupBuilder {
     IRenderNode* rNode;
     string group;
 public:
+    
+    enum FieldType {
+        FT_NONE,
+        FT_INT,
+        FT_FLOAT,
+        FT_VECTOR3F,
+        FT_VECTOR4F
+    };
+
+
     ParticleGroupBuilder(PropertyList& plist, string group);
     
     IParticleGroup* GetParticleGroup();
     IRenderNode* GetRenderNode();
+    
     
     static pair<IParticleGroup*,IRenderNode*> BuildGroup(PropertyList& plist, string group);
     template <class T> static IEmitter<T>* BuildEmitter(PropertyList& plist, string group);
@@ -44,7 +48,9 @@ public:
     template <class T> static IModifier<T>* BuildModifier(PropertyList& plist, string group);
     
     template <class T> static pair<void (T::*)(float), int> MethodForField_float(string field);
-    template <class T> static pair<void (T::*)(Vector<3,float> ), int> MethodForField_vec3f(string field);
+    template <class T> static pair<void (T::*)(Vector<3,float> ), int>
+    MethodForField_vec3f(string field);
+    template <class T> static pair<Vector<3,float> (T::*)( ), int> MethodForField_get_vec3f(string field);
     //pair<string, void (T::*)(F)> MethodForField(string field);
     static FieldType TypeForField(string field);
 };

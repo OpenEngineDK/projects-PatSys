@@ -140,7 +140,7 @@ template <class T> IModifier<T>* ParticleGroupBuilder::BuildModifier(PropertyLis
               
         string field = plist.GetString(group + ".field");
         FieldType type = TypeForField(field);
-        logger.info << "type is: " << type << logger.end;
+        
         switch (type) {
             case FT_FLOAT: {
                 void (T::*ptr)(float);
@@ -168,7 +168,7 @@ template <class T> IModifier<T>* ParticleGroupBuilder::BuildModifier(PropertyLis
     } else if (type == "WobblyField") {
         string field = plist.GetString(group + ".field");
         FieldType type = TypeForField(field);
-        logger.info << "type is: " << type << logger.end;
+
         switch (type) {
             case FT_FLOAT: {
                 void (T::*ptr)(float);

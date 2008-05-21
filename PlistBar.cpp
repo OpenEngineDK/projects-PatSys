@@ -15,13 +15,14 @@ void PlistBar::AddFields(ITweakBar* bar) {
     Callback<PlistBar>* rebindCB = 
     new Callback<PlistBar>(*this, &PlistBar::Rebind);
     
-    //AddButton<PlistBar>("Rebind", rebind);
+    rebindCB->name = "Rebind";
+    AddCallBack(rebindCB);
 
-    TwAddButton(bar->GetBar(),
-                "Rebind",
-                ITweakBar::AntCallback,
-                rebindCB,
-                NULL);
+    Callback<PropertyList>* saveCB = 
+        new Callback<PropertyList>(plist,
+                                   &PropertyList::Save);
+    saveCB->name = "Save";
+    AddCallBack(saveCB);
 
 
     for (list<ICallback*>::iterator itr = callbacks.begin();
@@ -34,63 +35,42 @@ void PlistBar::AddFields(ITweakBar* bar) {
                     NULL);
     }
     
+    BindingsManager *mgr = plist.GetBindingsManager();
     
-    map<string,pair<int,pair<string,void*> > > pointers = plist.GetFetctPointers();
-    for (map<string,pair<int,pair<string,void*> > >::iterator 
-         itr = pointers.begin();
-         itr != pointers.end();
+    set<string> keys = plist.GetBoundKeys();
+
+
+    for (set<string>::iterator itr = keys.begin();
+         itr != keys.end();
          itr++) {
-        pair<string,pair<int,pair<string,void*> > > elm = *itr;
-        string key = elm.first;
-        //int idx = elm.second.first;
-        string type = elm.second.second.first;
-        void* p = elm.second.second.second;
+
+        string key = *itr;
         
-		string group = PropertyList::GroupOf(key);
-		string name = PropertyList::NameOf(key);
-		
-		//logger.info << "Group for " << key << " is " << PropertyList::GroupOf(key) << logger.end;
-		
-        if (type == "float") {
-            
+        string type = mgr->TypeFor(key);
+        string group = PropertyList::GroupOf(key);
+        string name = PropertyList::NameOf(key);
+        if (typeid(float).name() == type) {
             TwAddVarRW(bar->GetBar(),
-                       key.c_str(),
+                       (key).c_str(),
                        TW_TYPE_FLOAT,
-                       p,
+                       mgr->GetPointer<float>(key),
                        (string("group=") + group + " label=" + name ).c_str() );
-			
-			string metaKey = "meta." + name + ".min";
-			if (plist.HaveKey(metaKey)) {
-				TwDefine((string(TwGetBarName(bar->GetBar())) + "/" + key + " min="+plist.GetString(metaKey)).c_str());
-			}
-			metaKey = "meta." + name + ".max";
-			if (plist.HaveKey(metaKey)) {
-				TwDefine((string(TwGetBarName(bar->GetBar())) + "/" + key + " max="+plist.GetString(metaKey)).c_str());
-			}
-			
-			
-		} else if (type == "bool") {
-			
-			TwAddVarRW(bar->GetBar(),
-					   key.c_str(), 
-					   TW_TYPE_BOOLCPP, 
-					   p, 
-					   (string("group=") + group + " label=" + name).c_str());
-        } else if (type == "color") {
-			Vector<4,float> *pv;
-            pv = (Vector<4,float>*)p;
-			TwAddVarRW(bar->GetBar(),
-					   key.c_str(), 
-					   TW_TYPE_COLOR4F, 
-					   &((*pv)[0]), 
-					   (string("group=") + group + " label=" + name).c_str());
+            string metaKey = "meta." + name + ".min";
+            if (plist.HaveKey(metaKey)) {
+                TwDefine((string(TwGetBarName(bar->GetBar())) + "/" + key + " min="+plist.GetString(metaKey)).c_str());
+            }
+            metaKey = "meta." + name + ".max";
+            if (plist.HaveKey(metaKey)) {
+                TwDefine((string(TwGetBarName(bar->GetBar())) + "/" + key + " max="+plist.GetString(metaKey)).c_str());
+            }
             
-		} else if (type == "int") {
-			
-			TwAddVarRW(bar->GetBar(),
+                        
+        } else if (typeid(int).name() == type) {
+
+            TwAddVarRW(bar->GetBar(),
 					   key.c_str(), 
 					   TW_TYPE_INT32, 
-					   p, 
+					   mgr->GetPointer<int>(key), 
 					   (string("group=") + group + " label=" + name).c_str());
 			
 			
@@ -101,13 +81,16 @@ void PlistBar::AddFields(ITweakBar* bar) {
 			metaKey = "meta." + name + ".max";
 			if (plist.HaveKey(metaKey)) {
 				TwDefine((string(TwGetBarName(bar->GetBar())) + "/" + key + " max="+plist.GetString(metaKey)).c_str());
-			}
-            
-			
-			
-        } else if (type == "vector3float") {
+            }
+        } else if (typeid(bool).name() == type) {
+            TwAddVarRW(bar->GetBar(),
+					   key.c_str(), 
+					   TW_TYPE_BOOLCPP, 
+					   mgr->GetPointer<bool>(key), 
+					   (string("group=") + group + " label=" + name).c_str());
+        } else if (typeid(Vector<3,float>).name() == type) {
             Vector<3,float> *pv;
-            pv = (Vector<3,float>*)p;
+            pv = mgr->GetPointer<Vector<3,float> >(key);
             TwAddVarRW(bar->GetBar(),
                        (key + "-x").c_str(),
                        TW_TYPE_FLOAT,
@@ -124,10 +107,22 @@ void PlistBar::AddFields(ITweakBar* bar) {
 					   &((*pv)[2]),
                        (string("label='z' group=") + key).c_str());
 			TwDefine((string(TwGetBarName(bar->GetBar())) + "/" + key + " group=" + group + " label=" + name).c_str());
-            
+        } else if (typeid(Vector<4,float>).name() == type &&
+                   mgr->MetaFor(key) == "color") {
+            Vector<4,float> *pv;
+            pv = mgr->GetPointer<Vector<4,float> >(key);
+			TwAddVarRW(bar->GetBar(),
+					   key.c_str(), 
+					   TW_TYPE_COLOR4F, 
+					   &((*pv)[0]), 
+					   (string("group=") + group + " label=" + name).c_str());
+        } else {
+            logger.info << "PlistBar: Unhandled type: " 
+                        << type << " with meta: "
+                        << mgr->MetaFor(key)
+                        << logger.end;
         }
-    }
-    
+    }    
 }
 
 void PlistBar::Save() {

@@ -137,7 +137,8 @@ GameFactory::GameFactory() {
     
     // Create a renderer.
     this->renderer = new Renderer();
-    
+    this->renderer->SetFarPlane(50000.0);
+
     // Add a rendering view to the renderer
     this->renderer->AddRenderingView(new RenderingView(*viewport));
     
@@ -170,86 +171,6 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     
 	PropertyList *plist = new PropertyList("particles.txt");
     
-//	plist->SetIntP(&(emitter->speed), "emit.speed");
-//    
-//    
-//    plist->SetFloatP(&(emitter->prototype->energy), "test.energy");
-//    plist->SetFloatP(&(emitter->prototype->lifespan), "test.energy");
-//    plist->SetVectorP(&(emitter->prototype->pos), "test.start");
-//    plist->SetVectorP(&(emitter->prototype->direction), "test.dir");
-//    //emitter->prototype->size = 5;
-//    
-//    // blending
-//    plist->SetIntP(&(emitter->prototype->blendSrc), "proto.blendSrc");
-//    plist->SetIntP(&(emitter->prototype->blendDst), "proto.blendDst");
-//    
-//    plist->SetFloatP(&(emitter->prototype->size), "test.size");
-//    plist->SetColorP(&(emitter->prototype->color), "proto.color");
-//    //emitter->prototype->color = Vector<4,float>(1,.5,.5,.5);
-//    emitter->prototype->texr = ResourceManager<ITextureResource>::Create("particle.tga");
-//    GroupType* group = new GroupType(1000, emitter);
-//    
-//	
-//    
-//	
-//    //group->AddModifier(new StaticForceModifier<ParticleType >(Vector<3,float>(1,1,1)));
-//	WobblyFieldModifier<ParticleType, Vector<3,float> > *wob = new WobblyFieldModifier<ParticleType, Vector<3,float> >
-//	(&ParticleType::AddToPos, Vector<3,float>(.5,.7,.9));
-//	
-//	plist->SetBoolP(&(wob->active), "wobbly.active");
-//	
-//	//wob->active = plist->GetBool("wobbly.active");
-//    group->AddModifier(wob);
-    
-    //     group->AddModifier(new WobblyFieldModifier<ParticleType, Vector<4,float> >
-    //                        (&ParticleType::AddToColor, Vector<4,float>(.3,.3,.3,1)));
-    
-    
-    //    group->AddModifier(new StaticFieldModifier<ParticleType, float >
-    //                       (&ParticleType::AddToRotation, 10.0));
-//	float *p = plist->GetFloatP("test.test");
-//    
-//    Vector<3,float> *pv = plist->GetVectorP<3,float>("test.vec");
-//    
-    
-//    group->AddModifier(new PointerFieldModifier<ParticleType, float >
-//                       (&ParticleType::AddToRotation, p));
-//    
-//    group->AddModifier(new PointerFieldModifier<ParticleType, Vector<3,float> >
-//                       (&ParticleType::AddToPos, pv));
-//    
-//    //interpolator
-//    LinearInterpolator<float> *sizeInterp = new LinearInterpolator<float>(3);
-//    sizeInterp->AddPoint(0, 0, 10);
-//    sizeInterp->AddPoint(1, .5, 30);
-//    sizeInterp->AddPoint(2, 1, 0);
-//    
-//    InterpolatingFieldModifier<ParticleType, float, LinearInterpolator<float> >* sizeInMof = 
-//    new InterpolatingFieldModifier<ParticleType, float, LinearInterpolator<float> >(&ParticleType::SetSize, sizeInterp );
-//    group->AddModifier(sizeInMof);
-//    
-//
-////    QuadraticInterpolator<float, 3> *sizeInterp = new QuadraticInterpolator<float, 3>();
-////    sizeInterp->points[0] = 10.0;
-////    sizeInterp->points[1] = 30.0;
-////    sizeInterp->points[2] = 10.0;
-////    InterpolatingFieldModifier<ParticleType, float, QuadraticInterpolator<float,3> >* sizeInMof = 
-////    new InterpolatingFieldModifier<ParticleType, float, QuadraticInterpolator<float,3> >(&ParticleType::SetSize, sizeInterp );
-////    group->AddModifier(sizeInMof);
-////    
-////    
-//    group->AddModifier(new StaticFieldModifier<ParticleType, Vector<3,float> >
-//                       (&ParticleType::AddToPos, Vector<3,float>(.3,.2,0)));
-//    //group->AddModifier(new StaticEnergyModifier<ParticleType >(-10.0f));
-//    group->AddModifier(new StaticFieldModifier<ParticleType, float>
-//                       (&ParticleType::AddToEnergy, -1.0f));
-//    
-//    group->AddModifier(new FieldFieldModifier<ParticleType, Vector<3,float> >
-//                       (&ParticleType::AddToPos, &ParticleType::GetDirection));
-//    
-//    //system->AddGroup(group);
-//    
-
 
     ParticleGroupBuilder *groupBuilder = new ParticleGroupBuilder(*plist, string("p1"));
     

@@ -8,3 +8,6 @@ meta.blendDst.min = 0
 
 meta.blendSrc.max = 10
 meta.blendDst.max = 10
+
+meta.color.type = color
+meta.mode.type = respawnmode

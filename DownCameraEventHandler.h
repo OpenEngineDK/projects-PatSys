@@ -13,7 +13,9 @@ using namespace OpenEngine::Devices;
 namespace OpenEngine {
     namespace EventHandlers {
 
-class DownCameraEventHandler : public IModule {
+        class DownCameraEventHandler : public IModule, 
+                                       public IListener<MouseMovedEventArg>, 
+                                       public IListener<MouseButtonEventArg> {
 
 private:
     Camera* camera;
@@ -30,10 +32,12 @@ public:
     void Deinitialize();
     void Process(const float deltaTime, const float percent);
     bool IsTypeOf(const std::type_info& inf);
+            
+    void BindToEventSystem();
     
-    void HandleMouseMoved(MouseMovedEventArg e);
-    void HandleMouseDown(MouseButtonEventArg E);
-    void HandleMouseUp(MouseButtonEventArg e);
+    void Handle(MouseMovedEventArg e);
+    void Handle(MouseButtonEventArg e);
+            
 
 
 

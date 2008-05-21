@@ -1,4 +1,5 @@
 #include "DownCameraEventHandler.h"
+#include <Logging/Logger.h>
 
 namespace OpenEngine {
     namespace EventHandlers {
@@ -24,8 +25,8 @@ void DownCameraEventHandler::Deinitialize() {}
 void DownCameraEventHandler::Process(const float deltaTime, const float percent) {}
         bool DownCameraEventHandler::IsTypeOf(const std::type_info& inf) { return true; }
 
-void DownCameraEventHandler::HandleMouseMoved(MouseMovedEventArg e) {
-    
+void DownCameraEventHandler::Handle(MouseMovedEventArg e) {
+
     if (buttons & BUTTON_LEFT) {
         if (e.x == oldX && e.y == oldY)
             return;
@@ -62,16 +63,25 @@ void DownCameraEventHandler::HandleMouseMoved(MouseMovedEventArg e) {
       
 
 }
-void DownCameraEventHandler::HandleMouseDown(MouseButtonEventArg e) {
-    buttons = e.state.buttons;
-    oldX = e.state.x;
-    oldY = e.state.y;
-    mouse->HideCursor();
+
+void DownCameraEventHandler::BindToEventSystem() {
+    IMouse::mouseMovedEvent.Attach(*this);
+    IMouse::mouseButtonEvent.Attach(*this);
 }
-void DownCameraEventHandler::HandleMouseUp(MouseButtonEventArg e) {
-    buttons = e.state.buttons;
-    if (buttons == 0)
-        mouse->ShowCursor();
+
+void DownCameraEventHandler::Handle(MouseButtonEventArg e) {
+
+    if (e.type == MouseButtonEventArg::PRESS) {
+        buttons = e.state.buttons;
+        oldX = e.state.x;
+        oldY = e.state.y;
+        mouse->HideCursor();
+    } else {
+        buttons = e.state.buttons;
+        if (buttons == 0)
+            mouse->ShowCursor();
+
+    }
 }
 
     }

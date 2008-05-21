@@ -68,7 +68,9 @@ void CustomLevel::Load() {
     
     IModelResourcePtr res;
     ISceneNode* geom;
+
 //    FaceSet* fs;
+
 
     for (int i = 0; i < p.ListSize("sGeometry"); i++) {
         res = ResourceManager<IModelResource>::Create(p.GetString("sGeometry", i).data());

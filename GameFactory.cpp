@@ -43,6 +43,8 @@
 #include "PlistBar.h"
 #include "ParticleGroupBuilder.h"
 
+#include "QuitHandler.h"
+
 // Additional namespaces (others are in the header).
 using namespace OpenEngine::Devices;
 using namespace OpenEngine::Renderers::OpenGL;
@@ -275,7 +277,9 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     
     DownCameraEventHandler* cameraHandler = new DownCameraEventHandler(camera,
                                                                        this);
-    
+
+    cameraHandler->BindToEventSystem();
+
 	input->SetValidator(&AntTweakBarModule::HandleEvent);
 	
     engine.AddModule(*input);
@@ -321,23 +325,28 @@ bool GameFactory::SetupEngine(IGameEngine& engine) {
     
     
     //Bind the camera handlers
-    Listener<DownCameraEventHandler, MouseMovedEventArg>* cam_l
-    = new Listener<DownCameraEventHandler, MouseMovedEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseMoved);
-    IMouse::mouseMovedEvent.Add(cam_l);
     
-    Listener<DownCameraEventHandler, MouseButtonEventArg>* mdown
-    = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseDown);
-    IMouse::mouseDownEvent.Add(mdown);
+
+    // Listener<DownCameraEventHandler, MouseMovedEventArg>* cam_l
+//     = new Listener<DownCameraEventHandler, MouseMovedEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseMoved);
+//     IMouse::mouseMovedEvent.Add(cam_l);
     
-    Listener<DownCameraEventHandler, MouseButtonEventArg>* mup
-    = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseUp);
-    IMouse::mouseUpEvent.Add(mup);
+//     Listener<DownCameraEventHandler, MouseButtonEventArg>* mdown
+//     = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseDown);
+//     IMouse::mouseDownEvent.Add(mdown);
     
+//     Listener<DownCameraEventHandler, MouseButtonEventArg>* mup
+//     = new Listener<DownCameraEventHandler, MouseButtonEventArg> (*cameraHandler, &DownCameraEventHandler::HandleMouseUp);
+//     IMouse::mouseUpEvent.Add(mup);
     
-    QuitEventHandler* quit_h = new QuitEventHandler();
-    Listener<QuitEventHandler, KeyboardEventArg>* quit_l
-    = new Listener<QuitEventHandler, KeyboardEventArg> (*quit_h, &QuitEventHandler::HandleQuit);
-    IKeyboard::keyUpEvent.Add(quit_l);
+
+    QuitHandler* quit_h = new QuitHandler();
+    quit_h->BindToEventSystem();
+    
+//     QuitEventHandler* quit_h = new QuitEventHandler();
+//     Listener<QuitEventHandler, KeyboardEventArg>* quit_l
+//     = new Listener<QuitEventHandler, KeyboardEventArg> (*quit_h, &QuitEventHandler::HandleQuit);
+//     IKeyboard::keyUpEvent.Add(quit_l);
     
     // Add some module
     engine.AddModule(*(new OpenEngine::Utils::Statistics(1000)));

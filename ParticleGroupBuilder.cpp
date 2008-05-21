@@ -55,7 +55,8 @@ pair<IParticleGroup*,IRenderNode*> ParticleGroupBuilder::BuildGroup(PropertyList
         plist.SetIntP(&(particleGroup->totalCount), group + ".count");
         plist.SetBoolP(&(particleGroup->active), group + ".active");
 
-        plist.SetIntP(&(int(particleGroup->mode)), group + ".mode");
+        int *m = (int*)&(particleGroup->mode);
+        plist.SetIntP(m, group + ".mode");
         
         // TwEnumVal modeEV[] = {{EnergyParticleGroup::CONTINUOUS, "Continuous"},
 //                               {EnergyParticleGroup::ALL, "All"},

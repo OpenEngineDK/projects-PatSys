@@ -139,8 +139,12 @@ GameFactory::GameFactory() {
     this->renderer = new Renderer();
     this->renderer->SetFarPlane(50000.0);
 
+    renderer->initialize.Attach(*(new TextureLoader()));
+
     // Add a rendering view to the renderer
-    this->renderer->AddRenderingView(new RenderingView(*viewport));
+    //this->renderer->AddRenderingView(new RenderingView(*viewport));
+
+    renderer->process.Attach(*(new RenderingView(*viewport)));  // space leak
     
 }
 

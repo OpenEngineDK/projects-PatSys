@@ -39,7 +39,7 @@ pair<IParticleGroup*,IRenderNode*> ParticleGroupBuilder::BuildGroup(PropertyList
     string type = plist.GetString(group + ".type");
     if (type == "glow") {
         
-        IEmitter<ParticleTypeGlow >* emitter = BuildEmitter<ParticleTypeGlow >(plist, group);
+        Emitter<ParticleTypeGlow >* emitter = BuildEmitter<ParticleTypeGlow >(plist, group);
         EnergyParticleGroup<ParticleTypeGlow > *particleGroup = new EnergyParticleGroup<ParticleTypeGlow >(plist.GetInt(group + ".count"), emitter);
         
         // modifiers
@@ -73,7 +73,7 @@ pair<IParticleGroup*,IRenderNode*> ParticleGroupBuilder::BuildGroup(PropertyList
     return make_pair<IParticleGroup*,IRenderNode*>(NULL,NULL);
 }
 
-template <class T> IEmitter<T>* ParticleGroupBuilder::BuildEmitter(PropertyList& plist, string group) {
+template <class T> Emitter<T>* ParticleGroupBuilder::BuildEmitter(PropertyList& plist, string group) {
 
     string type = plist.GetString(group + ".emitter.type");
     if (type == "Point") {

@@ -1,0 +1,25 @@
+# Particle System dist
+
+# main repository
+darcs / http://openengine.dk/code/openengine
+
+# required extensions
+darcs /extensions/SDL             http://openengine.dk/code/extensions/SDL
+darcs /extensions/OpenGLRenderer  http://openengine.dk/code/extensions/OpenGLRenderer
+darcs /extensions/TGAResource     http://openengine.dk/code/extensions/TGAResource
+darcs /extensions/OBJResource     http://openengine.dk/code/extensions/OBJResource
+darcs /extensions/AccelerationStructures http://openengine.dk/code/extensions/AccelerationStructures
+
+darcs /extensions/ParticleSystem  http://openengine.dk/code/extensions/ParticleSystem
+darcs /extensions/PropertyList    http://openengine.dk/code/extensions/PropertyList
+darcs /extensions/AntTweakBar     http://openengine.dk/code/extensions/AntTweakBar
+darcs /extensions/Bindings	  http://openengine.dk/code/extensions/Bindings
+
+# project
+darcs /projects/PatSys http://openengine.dk/code/projects/PatSys
+
+
+
+#data
+any /projects/PatSys/data    http://www.openengine.dk/data/images/Smoke.zip
+any /projects/PatSys/data    http://www.openengine.dk/data/images/particle.tga

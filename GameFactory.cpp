@@ -134,10 +134,8 @@ GameFactory::GameFactory() {
     frustum->SetFar(1000);
     viewport->SetViewingVolume(frustum);
     
-    
     // Create a renderer.
     this->renderer = new Renderer();
-    this->renderer->SetFarPlane(50000.0);
 
     renderer->initialize.Attach(*(new TextureLoader()));
 

@@ -1,22 +1,22 @@
 # Particle System dist
 
 # main repository
-darcs / http://openengine.dk/code/openengine
+git / https://github.com/OpenEngineDK/openengine.git
 
 # required extensions
-darcs /extensions/SDL             http://openengine.dk/code/extensions/SDL
-darcs /extensions/OpenGLRenderer  http://openengine.dk/code/extensions/OpenGLRenderer
-darcs /extensions/TGAResource     http://openengine.dk/code/extensions/TGAResource
-darcs /extensions/OBJResource     http://openengine.dk/code/extensions/OBJResource
-darcs /extensions/AccelerationStructures http://openengine.dk/code/extensions/AccelerationStructures
+git /extensions/SDL             https://github.com/OpenEngineDK/extensions-SDL.git
+git /extensions/OpenGLRenderer  https://github.com/OpenEngineDK/extensions-OpenGLRenderer.git
+git /extensions/TGAResource     https://github.com/OpenEngineDK/extensions-TGAResource.git
+git /extensions/OBJResource     https://github.com/OpenEngineDK/extensions-OBJResource.git
+git /extensions/AccelerationStructures https://github.com/OpenEngineDK/extensions-AccelerationStructures.git
 
-darcs /extensions/ParticleSystem  http://openengine.dk/code/extensions/ParticleSystem
-darcs /extensions/PropertyList    http://openengine.dk/code/extensions/PropertyList
-darcs /extensions/AntTweakBar     http://openengine.dk/code/extensions/AntTweakBar
-darcs /extensions/Bindings	  http://openengine.dk/code/extensions/Bindings
+git /extensions/ParticleSystem  https://github.com/OpenEngineDK/extensions-ParticleSystem.git
+git /extensions/PropertyList    https://github.com/OpenEngineDK/extensions-PropertyList.git
+git /extensions/AntTweakBar     https://github.com/OpenEngineDK/extensions-AntTweakBar.git
+git /extensions/Bindings	  https://github.com/OpenEngineDK/extensions-Bindings.git
 
 # project
-darcs /projects/PatSys http://openengine.dk/code/projects/PatSys
+git /projects/PatSys https://github.com/OpenEngineDK/projects-PatSys.git
 
 
 
